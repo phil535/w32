@@ -2609,3 +2609,15 @@ const (
 	SMTO_NOTIMEOUTIFNOTHUNG = 0x0008
 	SMTO_ERRORONEXIT        = 0x0020
 )
+
+// File Mapping Security and Access Rights
+// https://msdn.microsoft.com/en-us/library/windows/desktop/aa366559(v=vs.85).aspx
+const (
+	FILE_MAP_ALL_ACCESS		= 0xf001f
+	FILE_MAP_READ			= 0x00004
+	FILE_MAP_WRITE			= 0x00002
+)
+
+const (
+	INVALID_HANDLE_VALUE		= HANDLE(^HANDLE(0))
+)

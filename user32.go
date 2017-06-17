@@ -315,7 +315,7 @@ func SendMessage(hwnd HWND, msg uint32, wParam, lParam uintptr) uintptr {
 	return ret
 }
 
-func SendMessage(hwnd HWND, msg uint32, wParam, lParam uintptr, fuFlags, uTimeout uint32) uintptr {
+func SendMessageTimeout(hwnd HWND, msg uint32, wParam, lParam uintptr, fuFlags, uTimeout uint32) uintptr {
 	ret, _, _ := procSendMessage.Call(
 		uintptr(hwnd),
 		uintptr(msg),

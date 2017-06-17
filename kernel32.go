@@ -49,6 +49,10 @@ var (
 	procReadProcessMemory          = modkernel32.NewProc("ReadProcessMemory")
 	procQueryPerformanceCounter    = modkernel32.NewProc("QueryPerformanceCounter")
 	procQueryPerformanceFrequency  = modkernel32.NewProc("QueryPerformanceFrequency")
+	procCreateFileMapping          = modkernel32.NewProc("CreateFileMappingW")
+	procOpenFileMapping            = modkernel32.NewProc("OpenFileMappingW")
+	procMapViewOfFile              = modkernel32.NewProc("MapViewOfFile")
+	procUnmapViewOfFile            = modkernel32.NewProc("UnmapViewOfFile")
 )
 
 func GetModuleHandle(modulename string) HINSTANCE {
@@ -385,4 +389,44 @@ func QueryPerformanceFrequency() uint64 {
     )
 
     return result
+}
+
+func CreateFileMapping(hFile HANDLE, lpAttributes *SECURITY_ATTRIBUTES, flProtect, dwMaximumSizeHigh, dwMaximumSizeLow uint32, lpName string)HANDLE{
+	ret, _, _ := procCreateFileMapping.Call(
+		uintptr(hFile),
+		uintptr(unsafe.Pointer(lpAttributes)),
+		uintptr(flProtect),
+		uintptr(dwMaximumSizeHigh),
+		uintptr(dwMaximumSizeLow),
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(lpName))))
+	return HANDLE(ret)
+}
+
+func OpenFileMapping(dwDesiredAccess uint32, bInheritHandle bool, lpName string)HANDLE{
+	var inheritHandle BOOL
+	if bInheritHandle == true{
+		inheritHandle = TRUE
+	}else{
+		inheritHandle = FALSE
+	}
+	ret, _, _ := procOpenFileMapping.Call(
+		uintptr(dwDesiredAccess),
+		uintptr(inheritHandle),
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(lpName))))
+	return HANDLE(ret)
+}
+
+func MapViewOfFile(hFileMappingObject HANDLE, dwDesiredAccess, dwFileOffsetHigh, dwFileOffsetLow uint32, dwNumberOfBytesToMap uintptr)uintptr{
+	ret, _, _ := procMapViewOfFile.Call(
+		uintptr(hFileMappingObject),
+		uintptr(dwDesiredAccess),
+		uintptr(dwFileOffsetHigh),
+		uintptr(dwFileOffsetLow),
+		dwNumberOfBytesToMap)
+	return ret
+}
+
+func UnmapViewOfFile(lpBaseAddress uintptr)bool{
+	ret, _, _ := procUnmapViewOfFile.Call(lpBaseAddress)
+	return ret != 0
 }
